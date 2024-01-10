@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #111;
+            text-align: center;
+            color: yellow;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        form {
+            text-align: center;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+            background-color: #111;
+            color: yellow;
+            margin-top: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        p {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h2>Login</h2>
+        <form method="POST" action="/login">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <input type="submit" value="Login">
+        </form>
+        <p>Don't have an account? <a href="/signup">Signup</a></p>
+    </div>
+</body>
+</html>
