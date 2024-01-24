@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Page</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/styles.css') }}">
+
+</head>
+<body>
+    <div class="border-container">
+        <div class="content-container">
+    <h2>Admin Page</h2>
+
+    <form method="post" action="/process">
+
+        <input type="file" accept="image/*" capture="environment" id="cameraInput">
+        <br>
+        <br>
+        <button type="button" onclick="startCamera()">Start Camera</button>
+        <br>
+        <br>
+        <button type="button" onclick="captureImage()">Capture Image</button>
+        <br>
+        <br>
+        <textarea id="base64Output" name="data" rows="10" cols="50" required></textarea>
+        <br>
+        <br>
+        <button type="submit">Process</button>
+        <br>
+        <br>
+        <button type="button" onclick="clearTextArea()">Clear Text</button>
+        <br>
+        <br>
+        <video id="cameraOutput" autoplay playsinline></video>
+        <br>
+        <br>
+    </form>
+
+
+
+
+
+
+
+    <form id="imageForm" method="POST" action="/process_image" enctype="multipart/form-data">
+        <input type="file" id="imageInput" name="image" accept="image/*">
+        <input type="text" id="imageAddress" readonly placeholder="Image Address">
+        <button type="submit">Process Image</button>
+    </form>
+    
+
+
+
+    <!-- Display selected image -->
+    <img id="selectedImage">
+    
+    <!-- Manual check for vehicle number -->
+    <form method="POST" action="/check_vehicle_number">
+        <label for="manual_vehicle_number">Manually Check Vehicle Number:</label>
+        <input type="text" id="manual_vehicle_number" name="manual_vehicle_number" required>
+        <button type="submit">Check</button>
+    </form>
+    
+    <table>
+        <tr>
+            <th>User ID</th>
+            <th>Username</th>
+            <th>Status</th>
+            <th>Vehicle Number</th>
+            <th>Update Status</th>
+        </tr>
+        {% for user in users %}
+            <tr>
+                <td>{{ user[0] }}</td>
+                <td>{{ user[1] }}</td>
+                <td>{{ user[3] }}</td>
+                <td>{{ user[4] }}</td>
+                <td>
+                    <form method="POST" action="/update_status/{{ user[0] }}">
+                        <select name="new_status">
+                            <option value="User">User</option>
+                            <option value="Admin">Admin</option>
+                        </select>
+                        <button type="submit">Update</button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <script>
+        document.getElementById('imageInput').addEventListener('change', function (event) {
+            const selectedImage = document.getElementById('selectedImage');
+            selectedImage.src = URL.createObjectURL(event.target.files[0]);
+
+            const imageAddress = document.getElementById('imageAddress');
+            imageAddress.value = event.target.files[0].name;
+        });
+
+        function clearTextArea() {
+            document.getElementById('base64Output').value = ''; // Clears the text area
+        }
+
+        let video, canvas, context;
+
+        function startCamera() {
+            video = document.getElementById('cameraOutput');
+            canvas = document.createElement('canvas');
+            context = canvas.getContext('2d');
+    
+            // Access the camera
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } })
+                .then(stream => {
+                    video.srcObject = stream;
+    
+                    // Show the video output below the buttons
+                    video.style.display = 'block';
+                })
+                .catch(error => {
+                    console.error('Error accessing camera:', error);
+                });
+        }
+    
+        function captureImage() {
+            if (!video) {
+                console.error('Camera not started');
+                return;
+            }
+    
+            // Capture image from video stream
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+    
+            // Convert the captured image to base64
+            const base64Data = canvas.toDataURL('image/jpeg').split(',')[1];
+    
+            // Display base64 data in the textarea
+            document.getElementById('base64Output').value = base64Data;
+        }
+    </script>
+    </div>
+</div>
+</body>
+</html>

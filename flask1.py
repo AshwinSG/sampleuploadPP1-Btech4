@@ -8,8 +8,9 @@ import pytesseract
 import pandas as pd
 import os
 import re
+import base64
 
-app = Flask(__name__)
+app = Flask(__name__,static_url_path='/static')
 app.secret_key = '12345'
 
     
@@ -227,6 +228,88 @@ def check_vehicle_number():
         return f"User: {username}, Status: {status}"
     else:
         return "Vehicle number not found in the database."
+    
+def perform_ocr_and_number_plate_detection(base64_image):
+    try:
+
+        # Decode base64 image
+        image_data = base64.b64decode(base64_image)
+        nparr = np.frombuffer(image_data, np.uint8)
+        image = cv2.imdecode(nparr, cv2.IMREAD_COLOR)
+
+        cv2.imshow('Captured Image', image)
+        cv2.waitKey(0)
+        cv2.destroyAllWindows()
+
+
+
+        # Check if the image is valid
+        if image is not None and image.size > 0:
+            # Resize the image
+            image = imutils.resize(image, width=500)
+            gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+            gray = cv2.bilateralFilter(gray, 11, 17, 17)
+            edged = cv2.Canny(gray, 170, 200)
+
+            # Find contours
+            contours, hierarchy = cv2.findContours(edged.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+
+            # Sort contours by area and keep the largest ones
+            contours = sorted(contours, key=cv2.contourArea, reverse=True)[:30]
+            NumberPlateCnt = None
+
+            for c in contours:
+                peri = cv2.arcLength(c, True)
+                approx = cv2.approxPolyDP(c, 0.02 * peri, True)
+                if len(approx) == 4:
+                    NumberPlateCnt = approx
+                    break
+
+            # Check if a valid contour was found
+            if NumberPlateCnt is not None:
+                mask = np.zeros(gray.shape, np.uint8)
+                new_image = cv2.drawContours(mask, [NumberPlateCnt], 0, 255, -1)
+            else:
+                return "No number plate detected."
+
+            new_image = cv2.bitwise_and(image, image, mask=mask)
+
+            # Configuration for Tesseract
+            config = ('-l eng --oem 1 --psm 3')
+
+            # Run Tesseract OCR on the image
+            text = pytesseract.image_to_string(new_image, config=config)
+
+            # Remove all empty spaces (whitespace) from the OCR result
+            text = re.sub(r'[^a-zA-Z0-9]', '', text)
+
+            # Print the OCR result
+            print("OCR Result:")
+            print(text)
+            return text
+        
+        else:
+            print("Error: Failed to decode or load the image.")
+
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+@app.route('/process', methods=['POST'])
+def process():
+    try:
+        # Get base64 image data from the form
+        base64_image_data = request.form['data']
+
+        # Call the OCR and number plate detection function
+        ocr_result = perform_ocr_and_number_plate_detection(base64_image_data)
+        print(ocr_result)
+        if ocr_result is not None:
+            return render_template('result.html', ocr_result = ocr_result)
+        else:
+            return 'Error processing data.'
+    
+    except Exception as e:
+        return f'Error processing data: {str(e)}'
 
 
 if __name__ == "__main__":

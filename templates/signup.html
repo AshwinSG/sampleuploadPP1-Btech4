@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Signup</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "San Francisco", "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            background-color: #f3f3f3;;
+            text-align: center;
+            margin: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            border: 2px solid #333;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .content {
+            text-align: center;
+        }
+
+        h2 {
+            margin: 0;
+        }
+
+        form {
+            text-align: center;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input[type="text"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid white;
+            border-radius: 5px;
+
+            color: white;
+            margin-top: 5px;
+        }
+
+        input[type="submit"] {
+            background-color: #9a5dd7;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        input[type="submit"] {
+            background-color: #481a77;; /* Purple background color for generic buttons */
+            color: #fff; /* Text color for generic buttons */
+        }
+
+        input[type="submit"]:hover {
+            background-color: #9a5dd7; /* Purple background color for generic buttons */
+            color: #fff; /* Text color for generic buttons */
+        }
+
+        p {
+            margin-top: 10px;
+        }
+
+        a {
+            color: #007bff;
+        }
+
+        a:hover {
+            color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="content">
+        <h2>Signup</h2>
+        <form method="POST" action="/signup">
+            <label for="username">Username:</label>
+            <input type="text" id="username" name="username" required>
+            
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+            
+            <label for="vehicle_number">Vehicle Number:</label>
+            <input type="text" id="vehicle_number" name="vehicle_number" required>
+            
+            <label for="status">Status:</label>
+            <select id="status" name="status">
+                <option value="User">User</option>
+                <option value="Admin">Admin</option>
+            </select>
+            
+            <input type="submit" value="Signup">
+        </form>
+        <p>Already have an account? <a href="/login">Login</a></p>
+    </div>
+</body>
+</html>
